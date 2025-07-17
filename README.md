@@ -2,7 +2,33 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+### Database Setup
+
+1. Make sure you have MySQL installed and running on your machine
+2. Create a new database for the application:
+   ```sql
+   CREATE DATABASE expense_assistant;
+   ```
+3. Copy `.env.example` to `.env` and update the `DATABASE_URL` with your MySQL credentials:
+   ```
+   DATABASE_URL="mysql://username:password@localhost:3306/expense_assistant"
+   ```
+4. Run the initial migration to set up the database schema:
+   ```bash
+   npm run prisma:migrate
+   # or
+   pnpm prisma:migrate
+   ```
+5. Generate the Prisma client:
+   ```bash
+   npm run prisma:generate
+   # or
+   pnpm prisma:generate
+   ```
+
+### Development Server
+
+Run the development server:
 
 ```bash
 npm run dev
