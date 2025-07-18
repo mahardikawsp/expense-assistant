@@ -50,7 +50,7 @@ export async function GET(
  */
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await auth();
@@ -59,7 +59,7 @@ export async function PUT(
         }
 
         const userId = session.user.id;
-        const { id } = params;
+        const { id } = await params;
         const body = await request.json();
 
         // Check if simulation exists and belongs to user
