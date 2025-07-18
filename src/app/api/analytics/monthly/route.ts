@@ -3,6 +3,27 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/session';
 import { startOfMonth, endOfMonth, subMonths, format } from 'date-fns';
 
+// Define types for our monthly data
+interface CategoryExpense {
+    category: string;
+    amount: number;
+}
+
+interface MonthlyData {
+    month: string;
+    expenses: number;
+    income: number;
+    savings: number;
+    savingsRate: number;
+    categories: CategoryExpense[];
+}
+
+interface MonthlyComparisonData extends MonthlyData {
+    expenseChange: number;
+    incomeChange: number;
+    savingsChange: number;
+}
+
 /**
  * GET /api/analytics/monthly
  * Retrieves monthly analytics data for comparison
@@ -23,7 +44,7 @@ export async function GET(request: Request) {
         const months = Math.min(Math.max(monthsToCompare, 1), 12);
 
         const now = new Date();
-        const monthlyData = [];
+        const monthlyData: MonthlyData[] = [];
 
         // Get data for each month
         for (let i = 0; i < months; i++) {
@@ -95,7 +116,7 @@ export async function GET(request: Request) {
         }
 
         // Calculate month-over-month changes
-        const monthlyComparison = monthlyData.map((month, index) => {
+        const monthlyComparison: MonthlyComparisonData[] = monthlyData.map((month, index) => {
             if (index === monthlyData.length - 1) {
                 return {
                     ...month,

@@ -135,8 +135,8 @@ export async function PUT(
  * Delete a simulation
  */
 export async function DELETE(
-    request: NextRequest,
-    { params }: { params: { id: string } }
+    _request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await auth();
@@ -145,7 +145,7 @@ export async function DELETE(
         }
 
         const userId = session.user.id;
-        const { id } = params;
+        const { id } = await params;
 
         // Check if simulation exists and belongs to user
         const existingSimulation = await prisma.simulation.findUnique({

@@ -1,5 +1,7 @@
 import { z } from 'zod';
-import { sanitizeInput, sanitizeObject, logError, ErrorCategory, ErrorSeverity } from './error-utils';
+import { sanitizeObject } from './error-utils';
+import { sanitizeInput } from './security-utils';
+import { logger } from './logging';
 
 /**
  * Utility functions for input validation and sanitization
@@ -107,14 +109,10 @@ export function validateAndSanitize<T>(
             });
 
             // Log validation errors
-            logError('Validation failed', {
-                severity: ErrorSeverity.WARNING,
-                category: ErrorCategory.VALIDATION,
-                context: {
-                    validationContext: context,
-                    errors,
-                    input: sanitizedInput
-                }
+            logger.warn('Validation failed', {
+                validationContext: context,
+                errors,
+                input: sanitizedInput
             });
 
             return { success: false, errors };
@@ -123,13 +121,11 @@ export function validateAndSanitize<T>(
         return { success: true, data: result.data };
     } catch (error) {
         // Log unexpected validation errors
-        logError(error instanceof Error ? error : new Error(String(error)), {
-            severity: ErrorSeverity.ERROR,
-            category: ErrorCategory.VALIDATION,
-            context: {
-                validationContext: options.context || 'form',
-                input
-            }
+        logger.error('Unexpected validation error', {
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+            validationContext: options.context || 'form',
+            input
         });
 
         return {

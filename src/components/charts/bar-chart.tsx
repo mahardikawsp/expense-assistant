@@ -84,7 +84,7 @@ export function BarChart({ title, labels, datasets, className }: BarChartProps) 
       },
       tooltip: {
         enabled: true,
-        mode: 'index',
+        mode: 'index' as const,
         intersect: false,
         callbacks: {
           label: function (context: any) {
@@ -148,8 +148,8 @@ export function BarChart({ title, labels, datasets, className }: BarChartProps) 
       }
     },
     interaction: {
-      mode: 'nearest',
-      axis: 'x',
+      mode: 'nearest' as const,
+      axis: 'x' as const,
       intersect: false
     },
     layout: {
@@ -170,7 +170,7 @@ export function BarChart({ title, labels, datasets, className }: BarChartProps) 
       backgroundColor: dataset.backgroundColor || 'rgba(5, 150, 105, 0.7)',
       borderColor: dataset.borderColor || 'rgb(5, 150, 105)',
       borderWidth: dataset.borderWidth || 1,
-      barThickness: isMobile ? 'flex' : undefined,
+      barThickness: isMobile ? ('flex' as const) : undefined,
       maxBarThickness: isMobile ? 30 : 50
     })),
   };

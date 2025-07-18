@@ -84,7 +84,7 @@ export function LineChart({ title, labels, datasets, className }: LineChartProps
             },
             tooltip: {
                 enabled: true,
-                mode: 'index',
+                mode: 'index' as const,
                 intersect: false,
                 callbacks: {
                     label: function (context: any) {
@@ -143,8 +143,8 @@ export function LineChart({ title, labels, datasets, className }: LineChartProps
             }
         },
         interaction: {
-            mode: 'nearest',
-            axis: 'x',
+            mode: 'nearest' as const,
+            axis: 'x' as const,
             intersect: false
         },
         elements: {

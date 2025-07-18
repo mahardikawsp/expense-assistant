@@ -75,11 +75,11 @@ export const authConfig = {
         params: {
           prompt: "consent",
           access_type: "offline",
-          response_type: "code"
+          response_type: "code",
+          // Using the exact redirect URI configured in Google Cloud Console
+          redirect_uri: "https://akzsasmqzien.us-east-1.clawcloudrun.com:3000/api/auth/callback/google"
         }
-      },
-      // Using the exact redirect URI configured in Google Cloud Console
-      callbackUrl: "https://akzsasmqzien.us-east-1.clawcloudrun.com:3000/api/auth/callback/google"
+      }
     }),
     CredentialsProvider({
       name: 'credentials',

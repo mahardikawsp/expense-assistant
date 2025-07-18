@@ -84,6 +84,30 @@ export default async function DashboardPage() {
   // Format notifications for display
   const formattedNotifications = recentNotifications.map(formatNotification);
 
+  // Map notification severity to the expected type values
+  const mappedNotifications = formattedNotifications.map(notification => {
+    // Define a type that matches exactly what the Notification component expects
+    type NotificationComponentType = 'default' | 'success' | 'warning' | 'error' | 'info';
+
+    // Map the severity to one of the allowed types
+    let notificationType: NotificationComponentType = 'default';
+
+    if (notification.severity === 'error') {
+      notificationType = 'error';
+    } else if (notification.severity === 'warning') {
+      notificationType = 'warning';
+    } else if (notification.severity === 'info') {
+      notificationType = 'info';
+    } else if (notification.severity === 'success') {
+      notificationType = 'success';
+    }
+
+    return {
+      ...notification,
+      notificationType
+    };
+  });
+
   // Calculate totals
   const totalIncome = parseFloat(incomeData._sum.amount?.toString() || '0');
   const totalExpenses = parseFloat(expenseData._sum.amount?.toString() || '0');
@@ -136,15 +160,15 @@ export default async function DashboardPage() {
           <div className="rounded-lg border border-border bg-card p-3 md:p-4">
             <h3 className="mb-2 md:mb-4 text-base md:text-lg font-medium">Notifications</h3>
             <div className="space-y-3 md:space-y-4 max-h-[250px] md:max-h-[300px] overflow-y-auto">
-              {formattedNotifications.map((notification) => (
+              {mappedNotifications.map((notification) => (
                 <Notification
                   key={notification.id}
                   title={notification.title}
                   message={notification.message}
-                  type={notification.severity}
+                  type={notification.notificationType}
                 />
               ))}
-              {formattedNotifications.length === 0 && (
+              {mappedNotifications.length === 0 && (
                 <p className="text-muted-foreground">No new notifications</p>
               )}
             </div>
