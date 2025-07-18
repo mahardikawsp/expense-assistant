@@ -30,15 +30,15 @@ export async function GET(request: NextRequest) {
         if (categories.length === 0) {
             return NextResponse.json({
                 categories: [
-                    'Food',
-                    'Housing',
-                    'Transportation',
-                    'Entertainment',
-                    'Healthcare',
-                    'Utilities',
-                    'Education',
-                    'Shopping',
-                    'Travel',
+                    'Belanja Mingguan',
+                    'Belanja Bulanan',
+                    'Keluarga',
+                    'Istri',
+                    'Have Fun',
+                    'Baby',
+                    'Transportasi',
+                    'Paket Data',
+                    'Kos',
                     'Other'
                 ]
             });
