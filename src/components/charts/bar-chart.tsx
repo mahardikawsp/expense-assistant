@@ -49,18 +49,29 @@ export function BarChart({ title, labels, datasets, className }: BarChartProps) 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Simplify labels for mobile if there are many
+  const mobileLabels = isMobile && labels.length > 5
+    ? labels.map((label, i) => {
+      // For mobile, show abbreviated labels
+      if (label.length > 8) {
+        return label.substring(0, 6) + '...';
+      }
+      return label;
+    })
+    : labels;
+
   const options = {
     responsive: true,
-    maintainAspectRatio: true,
-    aspectRatio: isMobile ? 1 : 2,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
+        display: !isMobile,
         position: 'top' as const,
         labels: {
-          boxWidth: isMobile ? 12 : 40,
-          padding: isMobile ? 10 : 20,
+          boxWidth: 12,
+          padding: 10,
           font: {
-            size: isMobile ? 10 : 12
+            size: 11
           }
         }
       },
@@ -68,7 +79,7 @@ export function BarChart({ title, labels, datasets, className }: BarChartProps) 
         display: !!title,
         text: title,
         font: {
-          size: isMobile ? 14 : 16
+          size: isMobile ? 12 : 14
         }
       },
       tooltip: {
@@ -82,12 +93,17 @@ export function BarChart({ title, labels, datasets, className }: BarChartProps) 
               label += ': ';
             }
             if (context.parsed.y !== null) {
-              label += new Intl.NumberFormat('en-US', {
+              label += new Intl.NumberFormat('id-ID', {
                 style: 'currency',
-                currency: 'USD'
+                currency: 'IDR'
               }).format(context.parsed.y);
             }
             return label;
+          },
+          title: function (tooltipItems: any) {
+            // Show full label in tooltip even if abbreviated on axis
+            const index = tooltipItems[0].dataIndex;
+            return labels[index];
           }
         }
       }
@@ -99,13 +115,21 @@ export function BarChart({ title, labels, datasets, className }: BarChartProps) 
           callback: function (value: any) {
             if (isMobile) {
               // Shorter format for mobile
-              return '$' + (value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value);
+              return value >= 1000000
+                ? (value / 1000000).toFixed(1) + 'M'
+                : value >= 1000
+                  ? (value / 1000).toFixed(0) + 'K'
+                  : value;
             }
-            return '$' + value;
+            return value;
           },
           font: {
-            size: isMobile ? 10 : 12
-          }
+            size: isMobile ? 8 : 10
+          },
+          maxTicksLimit: isMobile ? 5 : 8
+        },
+        grid: {
+          display: !isMobile
         }
       },
       x: {
@@ -113,8 +137,13 @@ export function BarChart({ title, labels, datasets, className }: BarChartProps) 
           maxRotation: isMobile ? 45 : 0,
           minRotation: isMobile ? 45 : 0,
           font: {
-            size: isMobile ? 10 : 12
-          }
+            size: isMobile ? 8 : 10
+          },
+          autoSkip: true,
+          maxTicksLimit: isMobile ? 6 : 10
+        },
+        grid: {
+          display: !isMobile
         }
       }
     },
@@ -122,22 +151,32 @@ export function BarChart({ title, labels, datasets, className }: BarChartProps) 
       mode: 'nearest',
       axis: 'x',
       intersect: false
+    },
+    layout: {
+      padding: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: isMobile ? 10 : 0
+      }
     }
   };
 
   const data = {
-    labels,
+    labels: mobileLabels,
     datasets: datasets.map(dataset => ({
       label: dataset.label,
       data: dataset.data,
-      backgroundColor: dataset.backgroundColor || 'rgba(5, 150, 105, 0.5)',
+      backgroundColor: dataset.backgroundColor || 'rgba(5, 150, 105, 0.7)',
       borderColor: dataset.borderColor || 'rgb(5, 150, 105)',
       borderWidth: dataset.borderWidth || 1,
+      barThickness: isMobile ? 'flex' : undefined,
+      maxBarThickness: isMobile ? 30 : 50
     })),
   };
 
   return (
-    <div className={className} style={{ height: isMobile ? '250px' : '300px' }}>
+    <div className={className} style={{ height: isMobile ? '200px' : '250px' }}>
       <Bar options={options} data={data} />
     </div>
   );

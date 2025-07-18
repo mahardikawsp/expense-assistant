@@ -175,23 +175,51 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
                 {isOpen && (
                     <div
                         data-notification-panel
-                        className="absolute right-0 md:right-auto md:left-0 mt-2 w-[calc(100vw-2rem)] sm:w-96 bg-background border border-border rounded-md shadow-lg z-50"
-                        style={{ maxWidth: 'calc(100vw - 2rem)' }}
+                        className="absolute right-0 top-full mt-2 w-screen max-w-[calc(100vw-1rem)] sm:max-w-[320px] bg-background border border-border rounded-md shadow-lg z-50"
+                        style={{
+                            maxHeight: 'calc(100vh - 100px)',
+                            right: '-10px',
+                            width: 'min(calc(100vw - 1rem), 320px)'
+                        }}
                     >
-                        <div className="p-3 border-b border-border flex justify-between items-center">
-                            <h3 className="font-medium">Notifications</h3>
-                            {unreadCount > 0 && (
+                        <div className="flex flex-wrap justify-between items-center p-2 sm:p-3 border-b border-border">
+                            <h3 className="font-medium text-sm">Notifications</h3>
+                            <div className="flex items-center gap-1 sm:gap-2">
+                                {unreadCount > 0 && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleMarkAllAsRead}
+                                        className="text-xs py-1 h-7 px-1 sm:px-2 whitespace-nowrap"
+                                    >
+                                        Mark all as read
+                                    </Button>
+                                )}
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={handleMarkAllAsRead}
-                                    className="text-xs py-2 h-auto"
+                                    onClick={() => setIsOpen(false)}
+                                    className="text-xs p-1 h-7 w-7 flex-shrink-0"
+                                    aria-label="Close notifications"
                                 >
-                                    Mark all as read
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    >
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
                                 </Button>
-                            )}
+                            </div>
                         </div>
-                        <div className="max-h-[60vh] md:max-h-96 overflow-y-auto">
+                        <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
                             {isLoading ? (
                                 <div className="flex justify-center p-4">
                                     <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
@@ -205,21 +233,21 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
                                     {notifications.map((notification) => (
                                         <div
                                             key={notification.id}
-                                            className={`p-4 hover:bg-muted/50 ${!notification.isRead ? 'bg-muted/20' : ''}`}
+                                            className={`p-2 sm:p-3 hover:bg-muted/50 ${!notification.isRead ? 'bg-muted/20' : ''}`}
                                         >
-                                            <div className="flex justify-between items-start">
-                                                <h4 className="font-medium text-sm">{notification.title}</h4>
-                                                <span className="text-xs text-muted-foreground ml-2 whitespace-nowrap">
+                                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
+                                                <h4 className="font-medium text-sm truncate">{notification.title}</h4>
+                                                <span className="text-[10px] sm:text-xs text-muted-foreground sm:ml-2 whitespace-nowrap">
                                                     {format(new Date(notification.createdAt), 'MMM d, h:mm a')}
                                                 </span>
                                             </div>
-                                            <p className="text-sm mt-1 break-words">{notification.message}</p>
+                                            <p className="text-xs mt-1 break-words line-clamp-2 sm:line-clamp-3">{notification.message}</p>
                                             {!notification.isRead && (
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={() => handleMarkAsRead(notification.id)}
-                                                    className="text-xs mt-2 py-2 h-auto"
+                                                    className="text-xs mt-2 py-1 h-6 sm:h-7 px-2"
                                                 >
                                                     Mark as read
                                                 </Button>
@@ -233,7 +261,7 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="w-full py-2 h-auto"
+                                className="w-full py-1 h-8 text-xs"
                                 onClick={() => {
                                     setIsOpen(false);
                                     setIsHistoryModalOpen(true);
@@ -326,9 +354,9 @@ function NotificationHistoryModal({ isOpen, onClose, userId }: NotificationHisto
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Notification History" size="lg">
+        <Modal isOpen={isOpen} onClose={onClose} title="Notification History" size="md">
             <ModalHeader>
-                <h2 className="text-xl font-semibold">Notification History</h2>
+                <h2 className="text-lg font-semibold">Notification History</h2>
             </ModalHeader>
             <ModalBody className="max-h-[60vh] overflow-y-auto">
                 {isLoading ? (
@@ -340,25 +368,25 @@ function NotificationHistoryModal({ isOpen, onClose, userId }: NotificationHisto
                         No notifications found
                     </div>
                 ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         {notifications.map((notification) => (
                             <div
                                 key={notification.id}
-                                className={`p-4 border border-border rounded-md ${!notification.isRead ? 'bg-muted/20' : ''}`}
+                                className={`p-2 sm:p-3 border border-border rounded-md ${!notification.isRead ? 'bg-muted/20' : ''}`}
                             >
-                                <div className="flex justify-between items-start">
-                                    <h4 className="font-medium">{notification.title}</h4>
-                                    <span className="text-xs text-muted-foreground">
-                                        {format(new Date(notification.createdAt), 'MMM d, yyyy h:mm a')}
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
+                                    <h4 className="font-medium text-sm truncate">{notification.title}</h4>
+                                    <span className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-0 sm:ml-2 whitespace-nowrap">
+                                        {format(new Date(notification.createdAt), 'MMM d, h:mm a')}
                                     </span>
                                 </div>
-                                <p className="mt-2">{notification.message}</p>
+                                <p className="mt-1 text-xs break-words line-clamp-3">{notification.message}</p>
                                 {!notification.isRead && (
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => handleMarkAsRead(notification.id)}
-                                        className="mt-2 py-2 h-auto"
+                                        className="mt-2 py-1 h-6 sm:h-7 text-xs"
                                     >
                                         Mark as read
                                     </Button>
@@ -376,7 +404,7 @@ function NotificationHistoryModal({ isOpen, onClose, userId }: NotificationHisto
                             size="sm"
                             disabled={page === 1}
                             onClick={() => setPage(prev => Math.max(1, prev - 1))}
-                            className="py-2 h-auto"
+                            className="py-1 h-8 text-xs"
                         >
                             Previous
                         </Button>
@@ -385,12 +413,12 @@ function NotificationHistoryModal({ isOpen, onClose, userId }: NotificationHisto
                             size="sm"
                             disabled={page === totalPages}
                             onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
-                            className="py-2 h-auto"
+                            className="py-1 h-8 text-xs"
                         >
                             Next
                         </Button>
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs text-muted-foreground">
                         Page {page} of {totalPages}
                     </div>
                 </div>

@@ -67,16 +67,16 @@ export function PieChart({
         plugins: {
             legend: {
                 position: isMobile ? 'bottom' as const : 'right' as const,
-                align: isMobile ? 'center' as const : 'center' as const,
+                align: 'center' as const,
                 labels: {
-                    boxWidth: isMobile ? 10 : 12,
-                    padding: isMobile ? 10 : 15,
+                    boxWidth: isMobile ? 8 : 12,
+                    padding: isMobile ? 8 : 15,
                     font: {
-                        size: isMobile ? 10 : 12
+                        size: isMobile ? 9 : 12
                     }
                 },
-                maxWidth: isMobile ? 200 : undefined,
-                maxHeight: isMobile ? 100 : undefined,
+                maxWidth: isMobile ? 180 : undefined,
+                maxHeight: isMobile ? 80 : undefined,
             },
             title: {
                 display: !!title,

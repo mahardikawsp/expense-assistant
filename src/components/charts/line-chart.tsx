@@ -54,46 +54,32 @@ export function LineChart({ title, labels, datasets, className }: LineChartProps
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+    // Simplify labels for mobile
+    const mobileLabels = isMobile
+        ? labels.map((label, index) => index % 2 === 0 ? label : '')
+        : labels;
+
     const options = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: {
                 position: 'top' as const,
+                align: 'center' as const,
                 labels: {
-                    boxWidth: isMobile ? 12 : 40,
-                    padding: isMobile ? 10 : 20,
+                    boxWidth: isMobile ? 8 : 12,
+                    padding: isMobile ? 8 : 10,
                     font: {
-                        size: isMobile ? 10 : 12
+                        size: isMobile ? 9 : 11
                     }
                 },
-                onClick: isMobile ? function (e: any, legendItem: any, legend: any) {
-                    // Toggle only one dataset at a time on mobile
-                    const index = legendItem.datasetIndex;
-                    const ci = legend.chart;
-
-                    // If all datasets are hidden, show only the clicked one
-                    const allHidden = ci.data.datasets.every((dataset: any, i: number) =>
-                        ci.getDatasetMeta(i).hidden === true
-                    );
-
-                    if (allHidden) {
-                        ci.data.datasets.forEach((dataset: any, i: number) => {
-                            ci.getDatasetMeta(i).hidden = i !== index;
-                        });
-                    } else {
-                        // Toggle the clicked dataset
-                        ci.getDatasetMeta(index).hidden = !ci.getDatasetMeta(index).hidden;
-                    }
-
-                    ci.update();
-                } : undefined
+                display: !isMobile || datasets.length <= 2
             },
             title: {
                 display: !!title,
                 text: title,
                 font: {
-                    size: isMobile ? 14 : 16
+                    size: isMobile ? 12 : 14
                 }
             },
             tooltip: {
@@ -107,9 +93,9 @@ export function LineChart({ title, labels, datasets, className }: LineChartProps
                             label += ': ';
                         }
                         if (context.parsed.y !== null) {
-                            label += new Intl.NumberFormat('en-US', {
+                            label += new Intl.NumberFormat('id-ID', {
                                 style: 'currency',
-                                currency: 'USD'
+                                currency: 'IDR'
                             }).format(context.parsed.y);
                         }
                         return label;
@@ -124,22 +110,35 @@ export function LineChart({ title, labels, datasets, className }: LineChartProps
                     callback: function (value: any) {
                         if (isMobile) {
                             // Shorter format for mobile
-                            return '$' + (value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value);
+                            return value >= 1000000
+                                ? (value / 1000000).toFixed(1) + 'M'
+                                : value >= 1000
+                                    ? (value / 1000).toFixed(0) + 'K'
+                                    : value;
                         }
-                        return '$' + value;
+                        return value;
                     },
                     font: {
-                        size: isMobile ? 10 : 12
-                    }
+                        size: isMobile ? 8 : 10
+                    },
+                    maxTicksLimit: isMobile ? 5 : 8
+                },
+                grid: {
+                    display: !isMobile
                 }
             },
             x: {
                 ticks: {
-                    maxRotation: isMobile ? 45 : 0,
-                    minRotation: isMobile ? 45 : 0,
+                    maxRotation: isMobile ? 0 : 0,
+                    minRotation: 0,
                     font: {
-                        size: isMobile ? 10 : 12
-                    }
+                        size: isMobile ? 8 : 10
+                    },
+                    autoSkip: true,
+                    maxTicksLimit: isMobile ? 5 : 10
+                },
+                grid: {
+                    display: !isMobile
                 }
             }
         },
@@ -150,11 +149,11 @@ export function LineChart({ title, labels, datasets, className }: LineChartProps
         },
         elements: {
             point: {
-                radius: isMobile ? 2 : 3,
-                hoverRadius: isMobile ? 4 : 6
+                radius: isMobile ? 0 : 2,
+                hoverRadius: isMobile ? 3 : 4
             },
             line: {
-                borderWidth: isMobile ? 2 : 3
+                borderWidth: isMobile ? 1.5 : 2
             }
         }
     };
@@ -168,7 +167,7 @@ export function LineChart({ title, labels, datasets, className }: LineChartProps
     ];
 
     const data = {
-        labels,
+        labels: mobileLabels,
         datasets: datasets.map((dataset, index) => ({
             label: dataset.label,
             data: dataset.data,
@@ -180,7 +179,7 @@ export function LineChart({ title, labels, datasets, className }: LineChartProps
     };
 
     return (
-        <div className={className} style={{ height: isMobile ? '250px' : '300px' }}>
+        <div className={className} style={{ height: isMobile ? '200px' : '250px' }}>
             <Line options={options} data={data} />
         </div>
     );

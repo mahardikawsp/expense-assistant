@@ -10,6 +10,7 @@ import { INCOME_CATEGORIES } from '@/lib/db-utils';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormError, FormField, FormLabel } from '@/components/forms/form';
 import { Input } from '@/components/ui/input';
+import { NumberInput } from '@/components/ui/number-input';
 import { Select, SelectOption } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
 
@@ -134,20 +135,16 @@ export function IncomeForm({ initialData, onSuccess, onCancel }: IncomeFormProps
             <FormField>
                 <FormLabel htmlFor="amount">Amount</FormLabel>
                 <FormControl>
-                    <div className="relative">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <span className="text-muted-foreground">$</span>
-                        </div>
-                        <Input
-                            id="amount"
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            className="pl-7"
-                            disabled={isLoading}
-                            {...form.register('amount')}
-                        />
-                    </div>
+                    <NumberInput
+                        id="amount"
+                        prefix="Rp "
+                        placeholder="1,000,000"
+                        disabled={isLoading}
+                        onValueChange={(value) => {
+                            form.setValue('amount', value.toString(), { shouldValidate: true });
+                        }}
+                        value={form.watch('amount')}
+                    />
                 </FormControl>
                 <FormError>{form.formState.errors.amount?.message}</FormError>
             </FormField>

@@ -9,10 +9,26 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Formats a number with commas as thousands separators
+ * @param value Number to format
+ * @returns Formatted number string with commas
+ */
+export function formatNumber(value: number | string): string {
+  // Convert to number if it's a string
+  const num = typeof value === 'string' ? parseFloat(value.replace(/,/g, '')) : value;
+
+  // Return empty string if not a valid number
+  if (isNaN(num)) return '';
+
+  // Format with commas
+  return num.toLocaleString('en-US');
+}
+
+/**
  * Formats a number as currency
  */
-export function formatCurrency(amount: number, currency = 'USD'): string {
-  return new Intl.NumberFormat('en-US', {
+export function formatCurrency(amount: number, currency = 'IDR'): string {
+  return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency,
   }).format(amount);

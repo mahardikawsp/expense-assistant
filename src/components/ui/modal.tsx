@@ -2,7 +2,6 @@
 
 import React, { useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-
 import { cn } from '@/lib/utils';
 
 interface ModalProps {
@@ -70,26 +69,27 @@ export function Modal({
         return () => setIsMounted(false);
     }, []);
 
-    // Size classes
-    const sizeClasses = {
-        sm: 'max-w-sm',
-        md: 'max-w',
-        lg: 'max-w-lg',
-        xl: 'max-w-xl',
-        full: 'max-w-full mx-4',
-    };
-
     if (!isOpen || !isMounted) {
         return null;
     }
 
+    // Simple size mapping
+    const modalWidth = {
+        sm: 'max-w-sm',
+        md: 'max-w-md',
+        lg: 'max-w-lg',
+        xl: 'max-w-xl',
+        full: 'max-w-[90vw]',
+    }[size];
+
     return createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <div
                 ref={modalRef}
+                style={{ width: 'auto', minWidth: '300px' }}
                 className={cn(
-                    'animate-in fade-in zoom-in-95 relative rounded-lg border border-border bg-background shadow-lg',
-                    sizeClasses[size],
+                    'bg-background rounded-lg border border-border shadow-lg',
+                    modalWidth,
                     className
                 )}
             >
@@ -120,7 +120,9 @@ export function Modal({
                         )}
                     </div>
                 )}
-                <div className="p-4">{children}</div>
+                <div className="p-4">
+                    {children}
+                </div>
             </div>
         </div>,
         document.body
@@ -137,7 +139,7 @@ export function ModalBody({ children, className }: { children: React.ReactNode; 
 
 export function ModalFooter({ children, className }: { children: React.ReactNode; className?: string }) {
     return (
-        <div className={cn('mt-6 flex items-center justify-end gap-2', className)}>
+        <div className={cn('mt-6 flex flex-wrap items-center justify-end gap-2', className)}>
             {children}
         </div>
     );

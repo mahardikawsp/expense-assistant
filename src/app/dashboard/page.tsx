@@ -91,49 +91,51 @@ export default async function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">Welcome to your financial overview</p>
         </div>
 
-        {/* Summary cards */}
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-lg border border-border bg-card p-6">
-            <h3 className="text-sm font-medium text-muted-foreground">Total Income</h3>
-            <p className="mt-2 text-3xl font-bold">{formatCurrency(totalIncome)}</p>
+        {/* Summary cards - 2x2 grid on mobile, 3x1 on desktop */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+          <div className="rounded-lg border border-border bg-card p-3 md:p-4">
+            <h3 className="text-xs md:text-sm font-medium text-muted-foreground">Total Income</h3>
+            <p className="mt-1 text-lg md:text-xl lg:text-2xl font-bold truncate">{formatCurrency(totalIncome)}</p>
           </div>
-          <div className="rounded-lg border border-border bg-card p-6">
-            <h3 className="text-sm font-medium text-muted-foreground">Total Expenses</h3>
-            <p className="mt-2 text-3xl font-bold">{formatCurrency(totalExpenses)}</p>
+          <div className="rounded-lg border border-border bg-card p-3 md:p-4">
+            <h3 className="text-xs md:text-sm font-medium text-muted-foreground">Total Expenses</h3>
+            <p className="mt-1 text-lg md:text-xl lg:text-2xl font-bold truncate">{formatCurrency(totalExpenses)}</p>
           </div>
-          <div className="rounded-lg border border-border bg-card p-6">
-            <h3 className="text-sm font-medium text-muted-foreground">Remaining Budget</h3>
-            <p className="mt-2 text-3xl font-bold">{formatCurrency(remainingBudget)}</p>
+          <div className="rounded-lg border border-border bg-card p-3 md:p-4 col-span-2 md:col-span-1">
+            <h3 className="text-xs md:text-sm font-medium text-muted-foreground">Remaining Budget</h3>
+            <p className="mt-1 text-lg md:text-xl lg:text-2xl font-bold truncate">{formatCurrency(remainingBudget)}</p>
           </div>
         </div>
 
-        {/* Charts */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="rounded-lg border border-border bg-card p-6">
-            <h3 className="mb-4 text-lg font-medium">Expenses by Category</h3>
-            {categoryData.length > 0 ? (
-              <BarChart
-                labels={categoryLabels}
-                datasets={[
-                  {
-                    label: 'Amount',
-                    data: categoryData,
-                  },
-                ]}
-              />
-            ) : (
-              <p className="text-muted-foreground text-center py-8">No expense data available</p>
-            )}
+        {/* Charts - Stack on mobile, side by side on desktop */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-lg border border-border bg-card p-3 md:p-4">
+            <h3 className="mb-2 md:mb-4 text-base md:text-lg font-medium">Expenses by Category</h3>
+            <div className="h-[250px] md:h-[300px]">
+              {categoryData.length > 0 ? (
+                <BarChart
+                  labels={categoryLabels}
+                  datasets={[
+                    {
+                      label: 'Amount',
+                      data: categoryData,
+                    },
+                  ]}
+                />
+              ) : (
+                <p className="text-muted-foreground text-center py-8">No expense data available</p>
+              )}
+            </div>
           </div>
-          <div className="rounded-lg border border-border bg-card p-6">
-            <h3 className="mb-4 text-lg font-medium">Notifications</h3>
-            <div className="space-y-4">
+          <div className="rounded-lg border border-border bg-card p-3 md:p-4">
+            <h3 className="mb-2 md:mb-4 text-base md:text-lg font-medium">Notifications</h3>
+            <div className="space-y-3 md:space-y-4 max-h-[250px] md:max-h-[300px] overflow-y-auto">
               {formattedNotifications.map((notification) => (
                 <Notification
                   key={notification.id}
