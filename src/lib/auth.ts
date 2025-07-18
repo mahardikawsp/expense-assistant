@@ -79,7 +79,7 @@ export const authConfig = {
         }
       },
       // Using the exact redirect URI configured in Google Cloud Console
-      callbackUrl: "http://localhost:3000/api/auth/callback/google"
+      callbackUrl: "https://akzsasmqzien.us-east-1.clawcloudrun.com:3000/api/auth/callback/google"
     }),
     CredentialsProvider({
       name: 'credentials',
