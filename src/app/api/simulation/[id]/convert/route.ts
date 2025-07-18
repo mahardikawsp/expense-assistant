@@ -10,8 +10,8 @@ import { convertSimulationToExpenses } from '@/lib/simulation-utils';
  * Convert a simulation to actual expenses
  */
 export async function POST(
-    request: NextRequest,
-    { params }: { params: { id: string } }
+    _request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await auth();
@@ -20,7 +20,7 @@ export async function POST(
         }
 
         const userId = session.user.id;
-        const { id } = params;
+        const { id } = await params;
 
         // Check if simulation exists and belongs to user
         const simulation = await prisma.simulation.findUnique({
