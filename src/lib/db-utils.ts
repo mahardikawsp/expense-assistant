@@ -29,7 +29,7 @@ export async function getDatabaseStats() {
     const incomeCount = await prisma.income.count();
     const expenseCount = await prisma.expense.count();
     const budgetCount = await prisma.budget.count();
-    
+
     return {
       userCount,
       incomeCount,
@@ -49,15 +49,16 @@ export async function getDatabaseStats() {
  * Predefined expense categories
  */
 export const EXPENSE_CATEGORIES = [
-  'Housing',
-  'Transportation',
-  'Food & Dining',
-  'Healthcare',
-  'Entertainment',
-  'Shopping',
-  'Education',
-  'Savings & Investments',
-  'Miscellaneous',
+  'Belanja Mingguan',
+  'Belanja Bulanan',
+  'Keluarga',
+  'Istri',
+  'Have Fun',
+  'Baby',
+  'Transportasi',
+  'Paket Data',
+  'Kos',
+  'Other'
 ];
 
 /**
