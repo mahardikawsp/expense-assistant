@@ -4,12 +4,9 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['lh3.googleusercontent.com'],
   },
-};
-
-export default nextConfig;
-
-module.exports = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-}
+};
+
+export default nextConfig;
