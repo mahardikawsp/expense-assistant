@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { withApiMiddleware } from '@/lib/api-middleware';
-import { validateApiInput, sanitizeObject, DatabaseError, NotFoundError } from '@/lib/error-utils';
 
 // Schema for simulation creation
 const simulationSchema = z.object({
@@ -51,22 +50,29 @@ const analyzeSchema = z.object({
  * GET /api/simulation
  * Get all simulations for the current user
  */
-export const GET = withApiMiddleware(async (request: NextRequest, { userId, requestId }) => {
-    // Get query parameters
-    const url = new URL(request.url);
-    const limit = parseInt(url.searchParams.get('limit') || '10');
-    const page = parseInt(url.searchParams.get('page') || '1');
-    const skip = (page - 1) * limit;
-
+export async function GET(request: NextRequest) {
     try {
+        const session = await auth();
+
+        // Check if user is authenticated
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Get query parameters
+        const { searchParams } = request.nextUrl;
+        const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit') as string, 10) : 10;
+        const page = searchParams.get('page') ? parseInt(searchParams.get('page') as string, 10) : 1;
+        const skip = (page - 1) * limit;
+
         // Get total count for pagination
         const total = await prisma.simulation.count({
-            where: { userId },
+            where: { userId: session.user.id },
         });
 
         // Get simulations with their expenses
         const simulations = await prisma.simulation.findMany({
-            where: { userId },
+            where: { userId: session.user.id },
             include: {
                 expenses: true,
             },
@@ -85,39 +91,54 @@ export const GET = withApiMiddleware(async (request: NextRequest, { userId, requ
                 limit,
                 totalPages: Math.ceil(total / limit),
             },
-            requestId,
         });
     } catch (error) {
-        throw new DatabaseError('Failed to fetch simulations');
+        console.error('Error fetching simulations:', error);
+        return NextResponse.json(
+            { error: 'Failed to fetch simulations' },
+            { status: 500 }
+        );
     }
-});
+}
 
 /**
  * POST /api/simulation
  * Create a new simulation
  */
-export const POST = withApiMiddleware(async (request: NextRequest, { userId, requestId }) => {
-    // Validate and sanitize request body
-    const validation = await validateApiInput(request, simulationSchema, {
-        userId,
-        requestId,
-        sanitize: true
-    });
-
-    if (!validation.success) {
-        return validation.error;
-    }
-
-    const { name, expenses } = validation.data;
-
+export async function POST(request: NextRequest) {
     try {
+        const session = await auth();
+
+        // Check if user is authenticated
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Parse and validate request body
+        const body = await request.json();
+        const validationResult = simulationSchema.safeParse(body);
+
+        if (!validationResult.success) {
+            return NextResponse.json(
+                { error: 'Invalid input', details: validationResult.error.format() },
+                { status: 400 }
+            );
+        }
+
+        const { name, expenses } = validationResult.data;
+
         // Create simulation with expenses
         const simulation = await prisma.simulation.create({
             data: {
                 name,
-                userId,
+                userId: session.user.id,
                 expenses: {
-                    create: expenses.map(expense => ({
+                    create: expenses.map((expense: {
+                        amount: number;
+                        description: string;
+                        category: string;
+                        date: string;
+                    }) => ({
                         amount: expense.amount,
                         description: expense.description,
                         category: expense.category,
@@ -130,11 +151,12 @@ export const POST = withApiMiddleware(async (request: NextRequest, { userId, req
             },
         });
 
-        return NextResponse.json({
-            data: simulation,
-            requestId
-        }, { status: 201 });
+        return NextResponse.json(simulation, { status: 201 });
     } catch (error) {
-        throw new DatabaseError('Failed to create simulation');
+        console.error('Error creating simulation:', error);
+        return NextResponse.json(
+            { error: 'Failed to create simulation' },
+            { status: 500 }
+        );
     }
-});
+}
